@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Card";
 import { IconCamera, IconCoffee, IconCookie, IconMoon, IconSun, IconX } from "@/components/icons";
@@ -38,6 +38,28 @@ export type MealFormValues = {
   photoUrl?: string | null;
 };
 
+type MealItem = {
+  id: string;
+  name: string;
+  calories: number;
+  carbG: number;
+  proteinG: number;
+  fatG: number;
+};
+
+function sumItems(items: MealItem[]) {
+  return items.reduce(
+    (acc, item) => {
+      acc.calories += item.calories;
+      acc.carbG += item.carbG;
+      acc.proteinG += item.proteinG;
+      acc.fatG += item.fatG;
+      return acc;
+    },
+    { calories: 0, carbG: 0, proteinG: 0, fatG: 0 }
+  );
+}
+
 /**
  * Mount this only while the sheet should be visible, with a `key` derived
  * from the meal being edited (or "new") — that remounts the form with fresh
@@ -57,20 +79,39 @@ export function MealFormSheet({
   dateLabel: string;
 }) {
   const [type, setType] = useState<MealType>(initial?.type ?? defaultType);
+  const [mealName, setMealName] = useState(initial?.name ?? "");
+  const [items, setItems] = useState<MealItem[]>(
+    initial
+      ? [
+          {
+            id: "initial",
+            name: initial.name,
+            calories: initial.calories,
+            carbG: initial.carbG,
+            proteinG: initial.proteinG,
+            fatG: initial.fatG,
+          },
+        ]
+      : []
+  );
+
   const [category, setCategory] = useState<FoodCategory | "">("");
   const [foodId, setFoodId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("g");
-  const [name, setName] = useState(initial?.name ?? "");
-  const [calories, setCalories] = useState(initial?.calories?.toString() ?? "");
-  const [carbG, setCarbG] = useState(initial?.carbG?.toString() ?? "");
-  const [proteinG, setProteinG] = useState(initial?.proteinG?.toString() ?? "");
-  const [fatG, setFatG] = useState(initial?.fatG?.toString() ?? "");
+  const [itemName, setItemName] = useState("");
+  const [calories, setCalories] = useState("");
+  const [carbG, setCarbG] = useState("");
+  const [proteinG, setProteinG] = useState("");
+  const [fatG, setFatG] = useState("");
+
   const [photoUrl, setPhotoUrl] = useState<string | null>(initial?.photoUrl ?? null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const selectedFood = getFoodById(foodId);
+
+  const totals = useMemo(() => sumItems(items), [items]);
 
   function applyFoodCalc(nextFoodId: string, nextQuantity: string, nextUnit: string) {
     const food = getFoodById(nextFoodId);
@@ -96,7 +137,7 @@ export function MealFormSheet({
     const food = getFoodById(nextFoodId);
     const defaultUnit = food?.units?.[0]?.label ?? "g";
     setUnit(defaultUnit);
-    if (food && !name.trim()) setName(food.name);
+    if (food && !itemName.trim()) setItemName(food.name);
     applyFoodCalc(nextFoodId, quantity, defaultUnit);
   }
 
@@ -108,6 +149,54 @@ export function MealFormSheet({
   function handleQuantityChange(nextQuantity: string) {
     setQuantity(nextQuantity);
     applyFoodCalc(foodId, nextQuantity, unit);
+  }
+
+  function resetDraft() {
+    setCategory("");
+    setFoodId("");
+    setQuantity("");
+    setUnit("g");
+    setItemName("");
+    setCalories("");
+    setCarbG("");
+    setProteinG("");
+    setFatG("");
+  }
+
+  function buildDraftItem(): MealItem | null {
+    const caloriesNum = Number(calories);
+    if (!itemName.trim() || !calories || Number.isNaN(caloriesNum) || caloriesNum < 0) {
+      return null;
+    }
+    const carbNum = Number(carbG) || 0;
+    const fatNum = Number(fatG) || 0;
+    const proteinNum = proteinG.trim()
+      ? Number(proteinG) || 0
+      : estimateProteinG(caloriesNum, carbNum, fatNum);
+
+    return {
+      id: crypto.randomUUID(),
+      name: itemName.trim(),
+      calories: caloriesNum,
+      carbG: carbNum,
+      proteinG: proteinNum,
+      fatG: fatNum,
+    };
+  }
+
+  function handleAddItem() {
+    const item = buildDraftItem();
+    if (!item) {
+      setError("Preencha o nome e as calorias do alimento antes de adicionar.");
+      return;
+    }
+    setError(null);
+    setItems((prev) => [...prev, item]);
+    resetDraft();
+  }
+
+  function handleRemoveItem(id: string) {
+    setItems((prev) => prev.filter((item) => item.id !== id));
   }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -122,31 +211,29 @@ export function MealFormSheet({
     e.preventDefault();
     setError(null);
 
-    const caloriesNum = Number(calories);
-    if (!name.trim()) {
-      setError("Dê um nome para a refeição.");
-      return;
+    let finalItems = items;
+    const draftItem = buildDraftItem();
+    if (draftItem) {
+      finalItems = [...items, draftItem];
     }
-    if (!calories || Number.isNaN(caloriesNum) || caloriesNum < 0) {
-      setError("Informe as calorias.");
+
+    if (finalItems.length === 0) {
+      setError("Adicione ao menos um alimento a essa refeição.");
       return;
     }
 
-    const carbNum = Number(carbG) || 0;
-    const fatNum = Number(fatG) || 0;
-    const proteinNum = proteinG.trim()
-      ? Number(proteinG) || 0
-      : estimateProteinG(caloriesNum, carbNum, fatNum);
+    const finalTotals = sumItems(finalItems);
+    const finalName = mealName.trim() || finalItems.map((item) => item.name).join(", ");
 
     setSubmitting(true);
     try {
       await onSubmit({
         type,
-        name: name.trim(),
-        calories: caloriesNum,
-        carbG: carbNum,
-        proteinG: proteinNum,
-        fatG: fatNum,
+        name: finalName,
+        calories: finalTotals.calories,
+        carbG: finalTotals.carbG,
+        proteinG: finalTotals.proteinG,
+        fatG: finalTotals.fatG,
         photoUrl,
       });
     } catch {
@@ -237,131 +324,187 @@ export function MealFormSheet({
           </div>
         </div>
 
-        <div className="mb-3 grid grid-cols-2 gap-2.5">
-          <div>
-            <Label htmlFor="meal-category">Tipo de alimento</Label>
-            <select
-              id="meal-category"
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value as FoodCategory | "")}
-              className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
-            >
-              <option value="">Selecionar (opcional)</option>
-              {FOOD_CATEGORY_ORDER.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
+        {items.length > 0 && (
+          <div className="mb-4 space-y-1.5">
+            <p className="text-caption text-text-secondary">
+              Itens desta refeição ({items.length})
+            </p>
+            <div className="space-y-1.5">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-button border border-border bg-background px-3 py-2"
+                >
+                  <div>
+                    <p className="text-body text-text-primary">{item.name}</p>
+                    <p className="nums text-caption text-text-secondary">
+                      {item.calories} kcal · C {item.carbG}g · P {item.proteinG}g · G {item.fatG}g
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(item.id)}
+                    aria-label={`Remover ${item.name}`}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-button text-text-secondary hover:bg-surface hover:text-error"
+                  >
+                    <IconX className="h-4 w-4" />
+                  </button>
+                </div>
               ))}
-            </select>
+            </div>
+            <div className="flex items-center justify-between px-1 pt-1">
+              <span className="text-caption text-text-secondary">Total</span>
+              <span className="nums text-caption font-semibold text-text-primary">
+                {totals.calories} kcal · C {totals.carbG}g · P {totals.proteinG}g · G {totals.fatG}g
+              </span>
+            </div>
           </div>
-          <div>
-            <Label htmlFor="meal-food">Alimento</Label>
-            <select
-              id="meal-food"
-              value={foodId}
-              onChange={(e) => handleFoodChange(e.target.value)}
-              disabled={!category}
-              className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary disabled:opacity-50"
-            >
-              <option value="">Selecionar</option>
-              {category &&
-                getFoodsByCategory(category).map((food) => (
-                  <option key={food.id} value={food.id}>
-                    {food.name}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="mb-3 grid grid-cols-2 gap-2.5">
-          <div>
-            <Label htmlFor="meal-quantity">Quantidade</Label>
-            <Input
-              id="meal-quantity"
-              inputMode="numeric"
-              value={quantity}
-              onChange={(e) => handleQuantityChange(e.target.value)}
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <Label htmlFor="meal-unit">Unidade</Label>
-            <select
-              id="meal-unit"
-              value={unit}
-              onChange={(e) => handleUnitChange(e.target.value)}
-              className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
-            >
-              <option value="g">Grama (g)</option>
-              {selectedFood?.units?.map((u) => (
-                <option key={u.label} value={u.label}>
-                  {u.label.charAt(0).toUpperCase() + u.label.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        )}
 
         <div className="mb-3">
-          <Label htmlFor="meal-name">Nome</Label>
+          <Label htmlFor="meal-name">Nome da refeição (opcional)</Label>
           <Input
             id="meal-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Ex.: Omelete com aveia"
-            autoFocus
+            value={mealName}
+            onChange={(e) => setMealName(e.target.value)}
+            placeholder="Ex.: Almoço no restaurante"
           />
         </div>
 
-        <div className="mb-3">
-          <Label htmlFor="meal-calories">Calorias (kcal)</Label>
-          <Input
-            id="meal-calories"
-            inputMode="numeric"
-            value={calories}
-            onChange={(e) => setCalories(e.target.value)}
-            placeholder="0"
-          />
-        </div>
+        <div className="mb-3 rounded-card border border-border p-3">
+          <p className="mb-2.5 text-caption font-semibold text-text-secondary">
+            Adicionar alimento
+          </p>
 
-        <div className="mb-4 grid grid-cols-3 gap-2.5">
-          <div>
-            <Label htmlFor="meal-carb" className="text-macro-carb">
-              Carbo (g)
-            </Label>
+          <div className="mb-2.5 grid grid-cols-2 gap-2.5">
+            <div>
+              <Label htmlFor="meal-category">Tipo de alimento</Label>
+              <select
+                id="meal-category"
+                value={category}
+                onChange={(e) => handleCategoryChange(e.target.value as FoodCategory | "")}
+                className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
+              >
+                <option value="">Selecionar (opcional)</option>
+                {FOOD_CATEGORY_ORDER.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="meal-food">Alimento</Label>
+              <select
+                id="meal-food"
+                value={foodId}
+                onChange={(e) => handleFoodChange(e.target.value)}
+                disabled={!category}
+                className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary disabled:opacity-50"
+              >
+                <option value="">Selecionar</option>
+                {category &&
+                  getFoodsByCategory(category).map((food) => (
+                    <option key={food.id} value={food.id}>
+                      {food.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mb-2.5 grid grid-cols-2 gap-2.5">
+            <div>
+              <Label htmlFor="meal-quantity">Quantidade</Label>
+              <Input
+                id="meal-quantity"
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => handleQuantityChange(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <Label htmlFor="meal-unit">Unidade</Label>
+              <select
+                id="meal-unit"
+                value={unit}
+                onChange={(e) => handleUnitChange(e.target.value)}
+                className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
+              >
+                <option value="g">Grama (g)</option>
+                {selectedFood?.units?.map((u) => (
+                  <option key={u.label} value={u.label}>
+                    {u.label.charAt(0).toUpperCase() + u.label.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mb-2.5">
+            <Label htmlFor="item-name">Nome do alimento</Label>
             <Input
-              id="meal-carb"
+              id="item-name"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+              placeholder="Ex.: Peito de frango empanado"
+            />
+          </div>
+
+          <div className="mb-2.5">
+            <Label htmlFor="item-calories">Calorias (kcal)</Label>
+            <Input
+              id="item-calories"
               inputMode="numeric"
-              value={carbG}
-              onChange={(e) => setCarbG(e.target.value)}
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
               placeholder="0"
             />
           </div>
-          <div>
-            <Label htmlFor="meal-protein" className="text-macro-protein">
-              Proteína (g)
-            </Label>
-            <Input
-              id="meal-protein"
-              inputMode="numeric"
-              value={proteinG}
-              onChange={(e) => setProteinG(e.target.value)}
-              placeholder="Auto"
-            />
+
+          <div className="mb-3 grid grid-cols-3 gap-2.5">
+            <div>
+              <Label htmlFor="item-carb" className="text-macro-carb">
+                Carbo (g)
+              </Label>
+              <Input
+                id="item-carb"
+                inputMode="numeric"
+                value={carbG}
+                onChange={(e) => setCarbG(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <Label htmlFor="item-protein" className="text-macro-protein">
+                Proteína (g)
+              </Label>
+              <Input
+                id="item-protein"
+                inputMode="numeric"
+                value={proteinG}
+                onChange={(e) => setProteinG(e.target.value)}
+                placeholder="Auto"
+              />
+            </div>
+            <div>
+              <Label htmlFor="item-fat" className="text-macro-fat">
+                Gordura (g)
+              </Label>
+              <Input
+                id="item-fat"
+                inputMode="numeric"
+                value={fatG}
+                onChange={(e) => setFatG(e.target.value)}
+                placeholder="0"
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="meal-fat" className="text-macro-fat">
-              Gordura (g)
-            </Label>
-            <Input
-              id="meal-fat"
-              inputMode="numeric"
-              value={fatG}
-              onChange={(e) => setFatG(e.target.value)}
-              placeholder="0"
-            />
-          </div>
+
+          <Button type="button" variant="secondary" className="w-full" onClick={handleAddItem}>
+            + Adicionar item à refeição
+          </Button>
         </div>
 
         {error && <p className="mb-3 text-caption text-error">{error}</p>}
