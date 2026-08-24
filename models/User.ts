@@ -19,6 +19,8 @@ const userSchema = new Schema(
     image: { type: String },
     provider: { type: String, enum: ["credentials", "google"], default: "credentials" },
     goals: { type: goalsSchema, default: () => ({}) },
+    heightCm: { type: Number },
+    weightKg: { type: Number },
   },
   { timestamps: true }
 );

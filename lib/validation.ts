@@ -30,3 +30,8 @@ export const goalsSchema = z.object({
   fatG: z.number().min(0).max(2000),
   waterMl: z.number().min(0).max(10000),
 });
+
+export const bodyMetricsSchema = z.object({
+  heightCm: z.number().min(50).max(272),
+  weightKg: z.number().min(20).max(500),
+});

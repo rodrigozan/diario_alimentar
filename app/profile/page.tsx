@@ -20,7 +20,13 @@ export default async function ProfilePage() {
 
   return (
     <AppShell userName={session?.user?.name}>
-      <ProfileClient name={session?.user?.name} email={session?.user?.email} goals={goals} />
+      <ProfileClient
+        name={session?.user?.name}
+        email={session?.user?.email}
+        goals={goals}
+        heightCm={user?.heightCm}
+        weightKg={user?.weightKg}
+      />
     </AppShell>
   );
 }

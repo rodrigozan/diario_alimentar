@@ -4,7 +4,13 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Card";
 import { IconCamera, IconCoffee, IconCookie, IconMoon, IconSun, IconX } from "@/components/icons";
-import { MEAL_TYPE_LABEL, MEAL_TYPE_ORDER, type MealLike, type MealType } from "@/lib/nutrition";
+import {
+  estimateProteinG,
+  MEAL_TYPE_LABEL,
+  MEAL_TYPE_ORDER,
+  type MealLike,
+  type MealType,
+} from "@/lib/nutrition";
 import { cn } from "@/lib/cn";
 
 const TYPE_ICON: Record<MealType, typeof IconCoffee> = {
@@ -75,15 +81,21 @@ export function MealFormSheet({
       return;
     }
 
+    const carbNum = Number(carbG) || 0;
+    const fatNum = Number(fatG) || 0;
+    const proteinNum = proteinG.trim()
+      ? Number(proteinG) || 0
+      : estimateProteinG(caloriesNum, carbNum, fatNum);
+
     setSubmitting(true);
     try {
       await onSubmit({
         type,
         name: name.trim(),
         calories: caloriesNum,
-        carbG: Number(carbG) || 0,
-        proteinG: Number(proteinG) || 0,
-        fatG: Number(fatG) || 0,
+        carbG: carbNum,
+        proteinG: proteinNum,
+        fatG: fatNum,
         photoUrl,
       });
     } catch {
@@ -218,7 +230,7 @@ export function MealFormSheet({
               inputMode="numeric"
               value={proteinG}
               onChange={(e) => setProteinG(e.target.value)}
-              placeholder="0"
+              placeholder="Auto"
             />
           </div>
           <div>

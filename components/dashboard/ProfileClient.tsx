@@ -1,20 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { signOut } from "next-auth/react";
 import { Card, Input, Label } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { IconCheck } from "@/components/icons";
+import { calculateBmi, classifyBmi } from "@/lib/nutrition";
 import type { Goals } from "./DashboardClient";
 
 export function ProfileClient({
   name,
   email,
   goals,
+  heightCm,
+  weightKg,
 }: {
   name?: string | null;
   email?: string | null;
   goals: Goals;
+  heightCm?: number | null;
+  weightKg?: number | null;
 }) {
   const [form, setForm] = useState({
     calories: String(goals.calories),
@@ -26,9 +31,21 @@ export function ProfileClient({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const [bodyForm, setBodyForm] = useState({
+    heightCm: heightCm ? String(heightCm) : "",
+    weightKg: weightKg ? String(weightKg) : "",
+  });
+  const [savingBody, setSavingBody] = useState(false);
+  const [savedBody, setSavedBody] = useState(false);
+
   function set(key: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
     setSaved(false);
+  }
+
+  function setBody(key: keyof typeof bodyForm, value: string) {
+    setBodyForm((f) => ({ ...f, [key]: value }));
+    setSavedBody(false);
   }
 
   async function handleSave() {
@@ -52,6 +69,31 @@ export function ProfileClient({
     }
   }
 
+  async function handleSaveBody() {
+    setSavingBody(true);
+    setSavedBody(false);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          heightCm: Number(bodyForm.heightCm) || 0,
+          weightKg: Number(bodyForm.weightKg) || 0,
+        }),
+      });
+      if (res.ok) setSavedBody(true);
+    } finally {
+      setSavingBody(false);
+    }
+  }
+
+  const bmi = useMemo(() => {
+    const h = Number(bodyForm.heightCm);
+    const w = Number(bodyForm.weightKg);
+    if (!h || !w) return 0;
+    return calculateBmi(h, w);
+  }, [bodyForm.heightCm, bodyForm.weightKg]);
+
   const initials = (name ?? email ?? "?").slice(0, 1).toUpperCase();
 
   return (
@@ -69,6 +111,55 @@ export function ProfileClient({
           <p className="truncate text-body font-medium text-text-primary">{name ?? "Você"}</p>
           <p className="truncate text-caption text-text-secondary">{email}</p>
         </div>
+      </Card>
+
+      <Card className="mb-4">
+        <h2 className="mb-4 text-h2 text-text-primary">Dados físicos</h2>
+
+        <div className="mb-3.5 grid grid-cols-2 gap-2.5">
+          <div>
+            <Label htmlFor="body-height">Altura (cm)</Label>
+            <Input
+              id="body-height"
+              inputMode="numeric"
+              value={bodyForm.heightCm}
+              onChange={(e) => setBody("heightCm", e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="body-weight">Peso (kg)</Label>
+            <Input
+              id="body-weight"
+              inputMode="numeric"
+              value={bodyForm.weightKg}
+              onChange={(e) => setBody("weightKg", e.target.value)}
+            />
+          </div>
+        </div>
+
+        {bmi > 0 && (
+          <div className="mb-4 rounded-button bg-primary/10 px-3.5 py-2.5">
+            <p className="text-caption text-text-secondary">Seu IMC</p>
+            <p className="text-h2 text-text-primary">
+              {bmi.toFixed(1)}{" "}
+              <span className="text-body font-normal text-text-secondary">
+                {classifyBmi(bmi)}
+              </span>
+            </p>
+          </div>
+        )}
+
+        <Button onClick={handleSaveBody} disabled={savingBody} className="w-full">
+          {savedBody ? (
+            <>
+              <IconCheck className="h-4 w-4" /> Dados salvos
+            </>
+          ) : savingBody ? (
+            "Salvando..."
+          ) : (
+            "Salvar dados físicos"
+          )}
+        </Button>
       </Card>
 
       <Card>

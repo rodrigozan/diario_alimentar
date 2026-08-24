@@ -38,3 +38,24 @@ export function clampPercent(value: number, goal: number) {
   if (goal <= 0) return 0;
   return Math.max(0, Math.min(100, (value / goal) * 100));
 }
+
+export function estimateProteinG(calories: number, carbG: number, fatG: number) {
+  const remainingKcal = calories - carbG * 4 - fatG * 9;
+  return Math.max(0, Math.round(remainingKcal / 4));
+}
+
+export function calculateBmi(heightCm: number, weightKg: number) {
+  if (heightCm <= 0 || weightKg <= 0) return 0;
+  const heightM = heightCm / 100;
+  return weightKg / (heightM * heightM);
+}
+
+export function classifyBmi(bmi: number) {
+  if (bmi <= 0) return "";
+  if (bmi < 18.5) return "Abaixo do peso";
+  if (bmi < 25) return "Peso normal";
+  if (bmi < 30) return "Sobrepeso";
+  if (bmi < 35) return "Obesidade grau I";
+  if (bmi < 40) return "Obesidade grau II";
+  return "Obesidade grau III";
+}
