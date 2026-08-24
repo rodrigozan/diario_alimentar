@@ -11,6 +11,7 @@ import {
   type MealLike,
   type MealType,
 } from "@/lib/nutrition";
+import { calculateMacrosFromFood, FOODS, getFoodById } from "@/lib/foods";
 import { cn } from "@/lib/cn";
 
 const TYPE_ICON: Record<MealType, typeof IconCoffee> = {
@@ -49,6 +50,8 @@ export function MealFormSheet({
   dateLabel: string;
 }) {
   const [type, setType] = useState<MealType>(initial?.type ?? defaultType);
+  const [foodId, setFoodId] = useState("");
+  const [quantityG, setQuantityG] = useState("");
   const [name, setName] = useState(initial?.name ?? "");
   const [calories, setCalories] = useState(initial?.calories?.toString() ?? "");
   const [carbG, setCarbG] = useState(initial?.carbG?.toString() ?? "");
@@ -58,6 +61,30 @@ export function MealFormSheet({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function applyFoodCalc(nextFoodId: string, nextQuantityG: string) {
+    const food = getFoodById(nextFoodId);
+    const quantityNum = Number(nextQuantityG);
+    if (!food || !nextQuantityG || Number.isNaN(quantityNum) || quantityNum <= 0) return;
+
+    const macros = calculateMacrosFromFood(food, quantityNum);
+    setCalories(macros.calories.toString());
+    setCarbG(macros.carbG.toString());
+    setProteinG(macros.proteinG.toString());
+    setFatG(macros.fatG.toString());
+  }
+
+  function handleFoodChange(nextFoodId: string) {
+    setFoodId(nextFoodId);
+    const food = getFoodById(nextFoodId);
+    if (food && !name.trim()) setName(food.name);
+    applyFoodCalc(nextFoodId, quantityG);
+  }
+
+  function handleQuantityChange(nextQuantityG: string) {
+    setQuantityG(nextQuantityG);
+    applyFoodCalc(foodId, nextQuantityG);
+  }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -183,6 +210,35 @@ export function MealFormSheet({
           />
           <div className="text-caption text-text-secondary">
             Foto do prato <span className="text-text-secondary/70">(opcional)</span>
+          </div>
+        </div>
+
+        <div className="mb-3 grid grid-cols-3 gap-2.5">
+          <div className="col-span-2">
+            <Label htmlFor="meal-food">Tipo de alimento</Label>
+            <select
+              id="meal-food"
+              value={foodId}
+              onChange={(e) => handleFoodChange(e.target.value)}
+              className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
+            >
+              <option value="">Selecionar (opcional)</option>
+              {FOODS.map((food) => (
+                <option key={food.id} value={food.id}>
+                  {food.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="meal-quantity">Quantidade (g)</Label>
+            <Input
+              id="meal-quantity"
+              inputMode="numeric"
+              value={quantityG}
+              onChange={(e) => handleQuantityChange(e.target.value)}
+              placeholder="0"
+            />
           </div>
         </div>
 
