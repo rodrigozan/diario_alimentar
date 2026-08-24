@@ -11,7 +11,14 @@ import {
   type MealLike,
   type MealType,
 } from "@/lib/nutrition";
-import { calculateMacrosFromFood, FOODS, getFoodById } from "@/lib/foods";
+import {
+  calculateMacrosFromFood,
+  convertToGrams,
+  FOOD_CATEGORY_ORDER,
+  getFoodById,
+  getFoodsByCategory,
+  type FoodCategory,
+} from "@/lib/foods";
 import { cn } from "@/lib/cn";
 
 const TYPE_ICON: Record<MealType, typeof IconCoffee> = {
@@ -50,8 +57,10 @@ export function MealFormSheet({
   dateLabel: string;
 }) {
   const [type, setType] = useState<MealType>(initial?.type ?? defaultType);
+  const [category, setCategory] = useState<FoodCategory | "">("");
   const [foodId, setFoodId] = useState("");
-  const [quantityG, setQuantityG] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [unit, setUnit] = useState("g");
   const [name, setName] = useState(initial?.name ?? "");
   const [calories, setCalories] = useState(initial?.calories?.toString() ?? "");
   const [carbG, setCarbG] = useState(initial?.carbG?.toString() ?? "");
@@ -61,29 +70,43 @@ export function MealFormSheet({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectedFood = getFoodById(foodId);
 
-  function applyFoodCalc(nextFoodId: string, nextQuantityG: string) {
+  function applyFoodCalc(nextFoodId: string, nextQuantity: string, nextUnit: string) {
     const food = getFoodById(nextFoodId);
-    const quantityNum = Number(nextQuantityG);
-    if (!food || !nextQuantityG || Number.isNaN(quantityNum) || quantityNum <= 0) return;
+    const quantityNum = Number(nextQuantity);
+    if (!food || !nextQuantity || Number.isNaN(quantityNum) || quantityNum <= 0) return;
 
-    const macros = calculateMacrosFromFood(food, quantityNum);
+    const quantityG = convertToGrams(food, quantityNum, nextUnit);
+    const macros = calculateMacrosFromFood(food, quantityG);
     setCalories(macros.calories.toString());
     setCarbG(macros.carbG.toString());
     setProteinG(macros.proteinG.toString());
     setFatG(macros.fatG.toString());
   }
 
-  function handleFoodChange(nextFoodId: string) {
-    setFoodId(nextFoodId);
-    const food = getFoodById(nextFoodId);
-    if (food && !name.trim()) setName(food.name);
-    applyFoodCalc(nextFoodId, quantityG);
+  function handleCategoryChange(nextCategory: FoodCategory | "") {
+    setCategory(nextCategory);
+    setFoodId("");
+    setUnit("g");
   }
 
-  function handleQuantityChange(nextQuantityG: string) {
-    setQuantityG(nextQuantityG);
-    applyFoodCalc(foodId, nextQuantityG);
+  function handleFoodChange(nextFoodId: string) {
+    setFoodId(nextFoodId);
+    setUnit("g");
+    const food = getFoodById(nextFoodId);
+    if (food && !name.trim()) setName(food.name);
+    applyFoodCalc(nextFoodId, quantity, "g");
+  }
+
+  function handleUnitChange(nextUnit: string) {
+    setUnit(nextUnit);
+    applyFoodCalc(foodId, quantity, nextUnit);
+  }
+
+  function handleQuantityChange(nextQuantity: string) {
+    setQuantity(nextQuantity);
+    applyFoodCalc(foodId, nextQuantity, unit);
   }
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -213,32 +236,69 @@ export function MealFormSheet({
           </div>
         </div>
 
-        <div className="mb-3 grid grid-cols-3 gap-2.5">
-          <div className="col-span-2">
-            <Label htmlFor="meal-food">Tipo de alimento</Label>
+        <div className="mb-3 grid grid-cols-2 gap-2.5">
+          <div>
+            <Label htmlFor="meal-category">Tipo de alimento</Label>
             <select
-              id="meal-food"
-              value={foodId}
-              onChange={(e) => handleFoodChange(e.target.value)}
+              id="meal-category"
+              value={category}
+              onChange={(e) => handleCategoryChange(e.target.value as FoodCategory | "")}
               className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
             >
               <option value="">Selecionar (opcional)</option>
-              {FOODS.map((food) => (
-                <option key={food.id} value={food.id}>
-                  {food.name}
+              {FOOD_CATEGORY_ORDER.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <Label htmlFor="meal-quantity">Quantidade (g)</Label>
+            <Label htmlFor="meal-food">Alimento</Label>
+            <select
+              id="meal-food"
+              value={foodId}
+              onChange={(e) => handleFoodChange(e.target.value)}
+              disabled={!category}
+              className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary disabled:opacity-50"
+            >
+              <option value="">Selecionar</option>
+              {category &&
+                getFoodsByCategory(category).map((food) => (
+                  <option key={food.id} value={food.id}>
+                    {food.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mb-3 grid grid-cols-2 gap-2.5">
+          <div>
+            <Label htmlFor="meal-quantity">Quantidade</Label>
             <Input
               id="meal-quantity"
               inputMode="numeric"
-              value={quantityG}
+              value={quantity}
               onChange={(e) => handleQuantityChange(e.target.value)}
               placeholder="0"
             />
+          </div>
+          <div>
+            <Label htmlFor="meal-unit">Unidade</Label>
+            <select
+              id="meal-unit"
+              value={unit}
+              onChange={(e) => handleUnitChange(e.target.value)}
+              className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
+            >
+              <option value="g">Grama (g)</option>
+              {selectedFood?.units?.map((u) => (
+                <option key={u.label} value={u.label}>
+                  {u.label.charAt(0).toUpperCase() + u.label.slice(1)}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
