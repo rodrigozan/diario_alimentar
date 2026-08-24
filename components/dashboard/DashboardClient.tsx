@@ -7,6 +7,7 @@ import { WaterWidget } from "./WaterWidget";
 import { MealCard } from "./MealCard";
 import { FloatingActionButton } from "./FloatingActionButton";
 import { MealFormSheet, type MealFormValues } from "./MealFormSheet";
+import { useAlertDialog } from "@/components/ui/AlertDialog";
 import {
   MEAL_TYPE_LABEL,
   MEAL_TYPE_ORDER,
@@ -48,6 +49,7 @@ export function DashboardClient({
   const [waterMl, setWaterMl] = useState(initialWaterMl);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingMeal, setEditingMeal] = useState<MealLike | null>(null);
+  const { confirm } = useAlertDialog();
 
   const totals = useMemo(() => sumMeals(meals), [meals]);
 
@@ -103,7 +105,13 @@ export function DashboardClient({
 
   async function handleDeleteMeal(meal: MealLike) {
     if (!meal._id) return;
-    if (!window.confirm(`Remover "${meal.name}"?`)) return;
+    const confirmed = await confirm({
+      title: "Remover refeição",
+      description: `Remover "${meal.name}"?`,
+      confirmLabel: "Remover",
+      variant: "danger",
+    });
+    if (!confirmed) return;
     setMeals((prev) => prev.filter((m) => m._id !== meal._id));
     await fetch(`/api/meals/${meal._id}`, { method: "DELETE" });
   }

@@ -53,7 +53,11 @@ export const FOODS: Food[] = [
   { id: "granola", name: "Granola", category: "Arroz e Grãos", kcalPer100g: 471, carbPer100gG: 64, proteinPer100gG: 10, fatPer100gG: 20, units: [{ label: "colher de sopa", grams: 15 }] },
 
   { id: "frango-peito-grelhado", name: "Peito de frango grelhado", category: "Frango", kcalPer100g: 159, carbPer100gG: 0, proteinPer100gG: 32, fatPer100gG: 2.5, units: [{ label: "filé", grams: 120 }] },
+  { id: "frango-peito-empanado", name: "Peito de frango empanado (frito)", category: "Frango", kcalPer100g: 260, carbPer100gG: 12, proteinPer100gG: 17, fatPer100gG: 16, units: [{ label: "pedaço", grams: 100 }] },
   { id: "frango-coxa", name: "Coxa de frango assada", category: "Frango", kcalPer100g: 195, carbPer100gG: 0, proteinPer100gG: 26, fatPer100gG: 9.3, units: [{ label: "unidade", grams: 90 }] },
+  { id: "frango-coxa-empanada", name: "Coxa de frango empanada (frita)", category: "Frango", kcalPer100g: 280, carbPer100gG: 11, proteinPer100gG: 18, fatPer100gG: 18, units: [{ label: "pedaço", grams: 100 }] },
+  { id: "frango-nuggets", name: "Nuggets de frango", category: "Frango", kcalPer100g: 296, carbPer100gG: 15, proteinPer100gG: 15, fatPer100gG: 19, units: [{ label: "unidade", grams: 18 }] },
+  { id: "frango-a-passarinho", name: "Frango a passarinho (frito)", category: "Frango", kcalPer100g: 275, carbPer100gG: 8, proteinPer100gG: 20, fatPer100gG: 18, units: [{ label: "pedaço", grams: 60 }] },
 
   { id: "carne-bovina-patinho", name: "Carne bovina (patinho) grelhada", category: "Carnes", kcalPer100g: 219, carbPer100gG: 0, proteinPer100gG: 35.9, fatPer100gG: 7.3, units: [{ label: "filé", grams: 120 }] },
   { id: "carne-moida", name: "Carne moída refogada", category: "Carnes", kcalPer100g: 212, carbPer100gG: 0, proteinPer100gG: 26.7, fatPer100gG: 11.2, units: [{ label: "colher de sopa", grams: 30 }] },

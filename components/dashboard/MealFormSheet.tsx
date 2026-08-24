@@ -93,10 +93,11 @@ export function MealFormSheet({
 
   function handleFoodChange(nextFoodId: string) {
     setFoodId(nextFoodId);
-    setUnit("g");
     const food = getFoodById(nextFoodId);
+    const defaultUnit = food?.units?.[0]?.label ?? "g";
+    setUnit(defaultUnit);
     if (food && !name.trim()) setName(food.name);
-    applyFoodCalc(nextFoodId, quantity, "g");
+    applyFoodCalc(nextFoodId, quantity, defaultUnit);
   }
 
   function handleUnitChange(nextUnit: string) {
