@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { IconDroplet } from "@/components/icons";
 import { cn } from "@/lib/cn";
 
-const QUICK_AMOUNTS = [250, 500];
+const QUICK_AMOUNTS = [50, 100, 250, 500];
 
 export function WaterWidget({
   valueMl,
@@ -100,7 +100,7 @@ export function WaterWidget({
           <p className="mt-0.5 text-caption text-primary">Meta batida hoje 🎉</p>
         )}
 
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {QUICK_AMOUNTS.map((amount) => (
             <button
               key={amount}
@@ -108,7 +108,7 @@ export function WaterWidget({
               onClick={() => handleAdd(amount)}
               disabled={pending !== null}
               className={cn(
-                "flex-1 rounded-button border border-border bg-background py-2 text-caption font-medium text-macro-water transition-colors",
+                "rounded-button border border-border bg-background py-2 text-caption font-medium text-macro-water transition-colors",
                 "hover:border-macro-water/50 disabled:opacity-50"
               )}
             >
