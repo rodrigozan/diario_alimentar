@@ -1,0 +1,142 @@
+- generic [ref=f1e1]:
+  - button "Open Next.js Dev Tools" [ref=f1e135] [cursor=pointer]
+  - alert [ref=f1e139]
+  - generic [ref=f1e140]:
+    - complementary [ref=f1e141]:
+      - generic [ref=f1e142]: Diário
+      - navigation [ref=f1e147]:
+        - list [ref=f1e148]:
+          - listitem [ref=f1e149]:
+            - link "Hoje" [ref=f1e150] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=f1e154]:
+            - link "Histórico" [ref=f1e155] [cursor=pointer]:
+              - /url: /history
+          - listitem [ref=f1e160]:
+            - link "Perfil" [ref=f1e161] [cursor=pointer]:
+              - /url: /profile
+      - generic [ref=f1e165]:
+        - paragraph [ref=f1e166]: Teste QA
+        - button "Sair da conta" [ref=f1e167] [cursor=pointer]
+    - main [ref=f1e168]:
+      - generic [ref=f1e169]:
+        - generic [ref=f1e170]:
+          - paragraph [ref=f1e171]: Hoje
+          - heading "Seu dia" [level=1] [ref=f1e172]
+        - generic [ref=f1e173]:
+          - img "0 de 2000 kcal consumidas" [ref=f1e174]:
+            - generic [ref=f1e235]:
+              - generic [ref=f1e236]: "2.000"
+              - generic [ref=f1e237]: kcal restantes
+              - generic [ref=f1e238]: meta 2.000 kcal
+          - generic [ref=f1e239]:
+            - generic [ref=f1e240]:
+              - generic [ref=f1e241]:
+                - generic [ref=f1e242]: Carboidrato
+                - generic [ref=f1e244]: 0 / 250g
+              - progressbar [ref=f1e245]
+            - generic [ref=f1e247]:
+              - generic [ref=f1e248]:
+                - generic [ref=f1e249]: Proteína
+                - generic [ref=f1e251]: 0 / 120g
+              - progressbar [ref=f1e252]
+            - generic [ref=f1e254]:
+              - generic [ref=f1e255]:
+                - generic [ref=f1e256]: Gordura
+                - generic [ref=f1e258]: 0 / 65g
+              - progressbar [ref=f1e259]
+        - generic [ref=f1e269]:
+          - generic [ref=f1e270]: Água
+          - generic [ref=f1e273]:
+            - text: "0"
+            - generic [ref=f1e274]: / 2 L
+          - generic [ref=f1e275]:
+            - button "+50ml" [ref=f1e276] [cursor=pointer]
+            - button "+100ml" [ref=f1e277] [cursor=pointer]
+            - button "+250ml" [ref=f1e278] [cursor=pointer]
+            - button "+500ml" [ref=f1e279] [cursor=pointer]
+        - generic [ref=f1e280]:
+          - heading "Refeições" [level=2] [ref=f1e281]
+          - generic [ref=f1e282]:
+            - heading "Café da Manhã" [level=3] [ref=f1e285]
+            - heading "Almoço" [level=3] [ref=f1e289]
+            - heading "Jantar" [level=3] [ref=f1e293]
+            - heading "Lanche" [level=3] [ref=f1e297]
+            - heading "Bebida" [level=3] [ref=f1e301]
+        - button "Adicionar refeição" [ref=f1e303] [cursor=pointer]
+        - generic [ref=f1e306]:
+          - button "Fechar" [ref=f1e307] [cursor=pointer]
+          - generic [ref=f1e308]:
+            - generic [ref=f1e309]:
+              - generic [ref=f1e310]:
+                - heading "Nova refeição" [level=2] [ref=f1e311]
+                - paragraph [ref=f1e312]: Hoje
+              - button "Fechar" [ref=f1e313] [cursor=pointer]
+            - generic [ref=f1e316]:
+              - button "Café da Manhã" [active] [ref=f1e317] [cursor=pointer]
+              - button "Almoço" [ref=f1e322] [cursor=pointer]
+              - button "Jantar" [ref=f1e326] [cursor=pointer]
+              - button "Lanche" [ref=f1e329] [cursor=pointer]
+              - button "Bebida" [ref=f1e335] [cursor=pointer]
+            - generic [ref=f1e338]:
+              - button [ref=f1e339] [cursor=pointer]
+              - generic [ref=f1e343]: Foto do prato (opcional)
+            - generic [ref=f1e344]:
+              - generic [ref=f1e345]: Nome da refeição (opcional)
+              - textbox "Nome da refeição (opcional)" [ref=f1e346]:
+                - /placeholder: "Ex.: Almoço no restaurante"
+            - generic [ref=f1e347]:
+              - paragraph [ref=f1e348]: Adicionar alimento
+              - generic [ref=f1e349]:
+                - generic [ref=f1e350]:
+                  - generic [ref=f1e351]: Tipo de alimento
+                  - combobox "Tipo de alimento" [ref=f1e352]:
+                    - option "Selecionar (opcional)" [selected]
+                    - option "Carnes"
+                    - option "Frango"
+                    - option "Peixes"
+                    - option "Ovos"
+                    - option "Arroz e Grãos"
+                    - option "Tubérculos"
+                    - option "Pães"
+                    - option "Frutas"
+                    - option "Laticínios"
+                    - option "Oleaginosas e Gorduras"
+                    - option "Legumes e Verduras"
+                    - option "Suplementos"
+                - generic [ref=f1e353]:
+                  - generic [ref=f1e354]: Alimento
+                  - combobox "Alimento" [disabled] [ref=f1e355]:
+                    - option "Selecionar" [selected]
+              - generic [ref=f1e356]:
+                - generic [ref=f1e357]:
+                  - generic [ref=f1e358]: Quantidade
+                  - textbox "Quantidade" [ref=f1e359]:
+                    - /placeholder: "0"
+                - generic [ref=f1e360]:
+                  - generic [ref=f1e361]: Unidade
+                  - combobox "Unidade" [ref=f1e362]:
+                    - option "Grama (g)" [selected]
+              - generic [ref=f1e363]:
+                - generic [ref=f1e364]: Nome do alimento
+                - textbox "Nome do alimento" [ref=f1e365]:
+                  - /placeholder: "Ex.: Peito de frango empanado"
+              - generic [ref=f1e366]:
+                - generic [ref=f1e367]: Calorias (kcal)
+                - textbox "Calorias (kcal)" [ref=f1e368]:
+                  - /placeholder: "0"
+              - generic [ref=f1e369]:
+                - generic [ref=f1e370]:
+                  - generic [ref=f1e371]: Carbo (g)
+                  - textbox "Carbo (g)" [ref=f1e372]:
+                    - /placeholder: "0"
+                - generic [ref=f1e373]:
+                  - generic [ref=f1e374]: Proteína (g)
+                  - textbox "Proteína (g)" [ref=f1e375]:
+                    - /placeholder: Auto
+                - generic [ref=f1e376]:
+                  - generic [ref=f1e377]: Gordura (g)
+                  - textbox "Gordura (g)" [ref=f1e378]:
+                    - /placeholder: "0"
+              - button "+ Adicionar item à refeição" [ref=f1e379] [cursor=pointer]
+            - button "Adicionar refeição" [ref=f1e380] [cursor=pointer]

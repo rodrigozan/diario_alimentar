@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Card";
 import { IconCamera, IconCoffee, IconCookie, IconCup, IconMoon, IconSun, IconX } from "@/components/icons";
@@ -14,9 +14,10 @@ import {
 import {
   calculateMacrosFromFood,
   convertToGrams,
-  FOOD_CATEGORY_ORDER,
+  getCategoriesForMealType,
   getFoodById,
   getFoodsByCategory,
+  type Food,
   type FoodCategory,
 } from "@/lib/foods";
 import { cn } from "@/lib/cn";
@@ -96,6 +97,7 @@ export function MealFormSheet({
       : []
   );
 
+  const [foods, setFoods] = useState<Food[]>([]);
   const [category, setCategory] = useState<FoodCategory | "">("");
   const [foodId, setFoodId] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -110,12 +112,35 @@ export function MealFormSheet({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const selectedFood = getFoodById(foodId);
+  const selectedFood = getFoodById(foods, foodId);
 
   const totals = useMemo(() => sumItems(items), [items]);
+  const availableCategories = useMemo(() => getCategoriesForMealType(foods, type), [foods, type]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/foods")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) setFoods(data.foods ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function handleTypeChange(nextType: MealType) {
+    setType(nextType);
+    if (category && !getFoodsByCategory(foods, category, nextType).length) {
+      setCategory("");
+      setFoodId("");
+      setUnit("g");
+    }
+  }
 
   function applyFoodCalc(nextFoodId: string, nextQuantity: string, nextUnit: string) {
-    const food = getFoodById(nextFoodId);
+    const food = getFoodById(foods, nextFoodId);
     const quantityNum = Number(nextQuantity);
     if (!food || !nextQuantity || Number.isNaN(quantityNum) || quantityNum <= 0) return;
 
@@ -135,7 +160,7 @@ export function MealFormSheet({
 
   function handleFoodChange(nextFoodId: string) {
     setFoodId(nextFoodId);
-    const food = getFoodById(nextFoodId);
+    const food = getFoodById(foods, nextFoodId);
     const defaultUnit = food?.units?.[0]?.label ?? "g";
     setUnit(defaultUnit);
     if (food && !itemName.trim()) setItemName(food.name);
@@ -284,7 +309,7 @@ export function MealFormSheet({
               <button
                 key={t}
                 type="button"
-                onClick={() => setType(t)}
+                onClick={() => handleTypeChange(t)}
                 className={cn(
                   "flex flex-col items-center gap-1 rounded-button border py-2.5 text-caption transition-colors",
                   active
@@ -387,7 +412,7 @@ export function MealFormSheet({
                 className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
               >
                 <option value="">Selecionar (opcional)</option>
-                {FOOD_CATEGORY_ORDER.map((cat) => (
+                {availableCategories.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
                   </option>
@@ -405,7 +430,7 @@ export function MealFormSheet({
               >
                 <option value="">Selecionar</option>
                 {category &&
-                  getFoodsByCategory(category).map((food) => (
+                  getFoodsByCategory(foods, category, type).map((food) => (
                     <option key={food.id} value={food.id}>
                       {food.name}
                     </option>
