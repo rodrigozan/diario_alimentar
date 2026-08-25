@@ -6,6 +6,7 @@ export type FoodCategory =
   | "Arroz e Grãos"
   | "Tubérculos"
   | "Pães"
+  | "Bebidas"
   | "Frutas"
   | "Laticínios"
   | "Oleaginosas e Gorduras"
@@ -20,6 +21,7 @@ export const FOOD_CATEGORY_ORDER: FoodCategory[] = [
   "Arroz e Grãos",
   "Tubérculos",
   "Pães",
+  "Bebidas",
   "Frutas",
   "Laticínios",
   "Oleaginosas e Gorduras",
@@ -104,13 +106,38 @@ export const FOODS: Food[] = [
   { id: "cara", name: "Cará cozido", category: "Tubérculos", kcalPer100g: 98, carbPer100gG: 23.1, proteinPer100gG: 2.3, fatPer100gG: 0.2, units: [{ label: "pedaço", grams: 100 }] },
 
   { id: "pao-frances", name: "Pão francês", category: "Pães", kcalPer100g: 300, carbPer100gG: 58.6, proteinPer100gG: 8, fatPer100gG: 3.1, units: [{ label: "unidade", grams: 50 }] },
+  { id: "pao-frances-fermentacao-natural", name: "Pão francês (fermentação natural)", category: "Pães", kcalPer100g: 255, carbPer100gG: 50, proteinPer100gG: 9.5, fatPer100gG: 1.5, units: [{ label: "unidade", grams: 50 }] },
   { id: "pao-integral", name: "Pão de forma integral", category: "Pães", kcalPer100g: 253, carbPer100gG: 43.5, proteinPer100gG: 9.4, fatPer100gG: 3.9, units: [{ label: "fatia", grams: 25 }] },
+  { id: "pao-integral-fermentacao-natural", name: "Pão de forma integral (fermentação natural)", category: "Pães", kcalPer100g: 240, carbPer100gG: 42, proteinPer100gG: 10, fatPer100gG: 2.5, units: [{ label: "fatia", grams: 30 }] },
   { id: "pao-forma-branco", name: "Pão de forma branco", category: "Pães", kcalPer100g: 266, carbPer100gG: 50.6, proteinPer100gG: 8, fatPer100gG: 3.1, units: [{ label: "fatia", grams: 25 }] },
+  { id: "pao-forma-branco-fermentacao-natural", name: "Pão de forma branco (fermentação natural)", category: "Pães", kcalPer100g: 250, carbPer100gG: 48, proteinPer100gG: 8.5, fatPer100gG: 1.8, units: [{ label: "fatia", grams: 30 }] },
   { id: "pao-de-queijo", name: "Pão de queijo", category: "Pães", kcalPer100g: 320, carbPer100gG: 30.6, proteinPer100gG: 6, fatPer100gG: 19.5, units: [{ label: "unidade", grams: 30 }] },
   { id: "tapioca", name: "Tapioca (goma hidratada)", category: "Pães", kcalPer100g: 143, carbPer100gG: 35, proteinPer100gG: 0.1, fatPer100gG: 0, units: [{ label: "unidade", grams: 80 }] },
   { id: "torrada", name: "Torrada integral", category: "Pães", kcalPer100g: 411, carbPer100gG: 74, proteinPer100gG: 12, fatPer100gG: 6, units: [{ label: "unidade", grams: 8 }] },
   { id: "biscoito-cream-cracker", name: "Biscoito cream cracker", category: "Pães", kcalPer100g: 432, carbPer100gG: 71.9, proteinPer100gG: 10.1, fatPer100gG: 11.9, units: [{ label: "unidade", grams: 7 }] },
   { id: "pao-hamburguer", name: "Pão de hambúrguer", category: "Pães", kcalPer100g: 280, carbPer100gG: 50, proteinPer100gG: 9, fatPer100gG: 4.5, units: [{ label: "unidade", grams: 60 }] },
+  { id: "pao-hamburguer-fermentacao-natural", name: "Pão de hambúrguer (fermentação natural)", category: "Pães", kcalPer100g: 260, carbPer100gG: 47, proteinPer100gG: 9, fatPer100gG: 3, units: [{ label: "unidade", grams: 60 }] },
+  { id: "brioche", name: "Brioche", category: "Pães", kcalPer100g: 375, carbPer100gG: 45, proteinPer100gG: 8, fatPer100gG: 18, units: [{ label: "unidade", grams: 50 }] },
+  { id: "brioche-fermentacao-natural", name: "Brioche (fermentação natural)", category: "Pães", kcalPer100g: 340, carbPer100gG: 44, proteinPer100gG: 8.5, fatPer100gG: 14, units: [{ label: "unidade", grams: 50 }] },
+  { id: "pao-caseiro", name: "Pão caseiro", category: "Pães", kcalPer100g: 280, carbPer100gG: 52, proteinPer100gG: 8, fatPer100gG: 4, units: [{ label: "fatia", grams: 50 }] },
+  { id: "pao-caseiro-fermentacao-natural", name: "Pão caseiro (fermentação natural)", category: "Pães", kcalPer100g: 260, carbPer100gG: 49, proteinPer100gG: 9, fatPer100gG: 2, units: [{ label: "fatia", grams: 50 }] },
+
+  { id: "cafe-coado", name: "Café coado", category: "Bebidas", kcalPer100g: 2, carbPer100gG: 0.3, proteinPer100gG: 0.1, fatPer100gG: 0, units: [{ label: "xícara", grams: 150 }] },
+  { id: "cafe-expresso", name: "Café expresso", category: "Bebidas", kcalPer100g: 3, carbPer100gG: 0.5, proteinPer100gG: 0.1, fatPer100gG: 0.1, units: [{ label: "dose", grams: 30 }] },
+  { id: "cappuccino", name: "Cappuccino", category: "Bebidas", kcalPer100g: 45, carbPer100gG: 4, proteinPer100gG: 2.5, fatPer100gG: 2.2, units: [{ label: "xícara", grams: 150 }] },
+  { id: "mochaccino", name: "Mochaccino", category: "Bebidas", kcalPer100g: 65, carbPer100gG: 8, proteinPer100gG: 2.5, fatPer100gG: 2.8, units: [{ label: "xícara", grams: 200 }] },
+  { id: "cafe-com-leite", name: "Café com leite (desnatado)", category: "Bebidas", kcalPer100g: 25, carbPer100gG: 3.5, proteinPer100gG: 1.8, fatPer100gG: 0.3, units: [{ label: "xícara", grams: 200 }] },
+  { id: "cafe-com-leite-integral", name: "Café com leite (integral)", category: "Bebidas", kcalPer100g: 38, carbPer100gG: 3.4, proteinPer100gG: 1.8, fatPer100gG: 1.8, units: [{ label: "xícara", grams: 200 }] },
+  { id: "refrigerante-cola", name: "Refrigerante de cola", category: "Bebidas", kcalPer100g: 42, carbPer100gG: 10.6, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "lata", grams: 350 }, { label: "copo", grams: 200 }] },
+  { id: "refrigerante-cola-zero", name: "Refrigerante de cola zero", category: "Bebidas", kcalPer100g: 0.3, carbPer100gG: 0, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "lata", grams: 350 }, { label: "copo", grams: 200 }] },
+  { id: "refrigerante-guarana", name: "Refrigerante de guaraná", category: "Bebidas", kcalPer100g: 39, carbPer100gG: 10, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "lata", grams: 350 }, { label: "copo", grams: 200 }] },
+  { id: "refrigerante-limao", name: "Refrigerante de limão", category: "Bebidas", kcalPer100g: 40, carbPer100gG: 10.5, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "lata", grams: 350 }, { label: "copo", grams: 200 }] },
+  { id: "suco-laranja-natural", name: "Suco de laranja natural", category: "Bebidas", kcalPer100g: 45, carbPer100gG: 10.4, proteinPer100gG: 0.7, fatPer100gG: 0.2, units: [{ label: "copo", grams: 200 }] },
+  { id: "suco-uva-integral", name: "Suco de uva integral", category: "Bebidas", kcalPer100g: 60, carbPer100gG: 15, proteinPer100gG: 0.4, fatPer100gG: 0, units: [{ label: "copo", grams: 200 }] },
+  { id: "suco-caju", name: "Suco de caju", category: "Bebidas", kcalPer100g: 45, carbPer100gG: 11, proteinPer100gG: 0.2, fatPer100gG: 0.1, units: [{ label: "copo", grams: 200 }] },
+  { id: "suco-caixinha", name: "Suco industrializado (caixinha)", category: "Bebidas", kcalPer100g: 48, carbPer100gG: 12, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "caixinha", grams: 200 }] },
+  { id: "agua-com-gas", name: "Água com gás", category: "Bebidas", kcalPer100g: 0, carbPer100gG: 0, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "copo", grams: 200 }, { label: "garrafa", grams: 500 }] },
+  { id: "energetico", name: "Energético", category: "Bebidas", kcalPer100g: 45, carbPer100gG: 11, proteinPer100gG: 0, fatPer100gG: 0, units: [{ label: "lata", grams: 250 }] },
 
   { id: "banana", name: "Banana", category: "Frutas", kcalPer100g: 89, carbPer100gG: 22.8, proteinPer100gG: 1.1, fatPer100gG: 0.3, units: [{ label: "unidade", grams: 100 }] },
   { id: "maca", name: "Maçã", category: "Frutas", kcalPer100g: 52, carbPer100gG: 13.8, proteinPer100gG: 0.3, fatPer100gG: 0.2, units: [{ label: "unidade", grams: 130 }] },
