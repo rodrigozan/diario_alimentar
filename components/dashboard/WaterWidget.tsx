@@ -53,11 +53,12 @@ export function WaterWidget({
           <g clipPath="url(#bottle-clip)">
             <rect
               x="0"
-              y={96 - (percent / 100) * 96}
+              y="0"
               width="56"
               height="96"
               fill="url(#water-fill)"
-              className="transition-all duration-700 ease-out"
+              className="transition-transform duration-700 ease-out"
+              style={{ transform: `translateY(${96 - (percent / 100) * 96}px)` }}
             />
           </g>
 
