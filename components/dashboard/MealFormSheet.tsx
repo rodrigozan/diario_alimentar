@@ -432,7 +432,7 @@ export function MealFormSheet({
                 onChange={(e) => handleUnitChange(e.target.value)}
                 className="h-11 w-full rounded-button border border-border bg-background px-3.5 text-body text-text-primary outline-none transition-colors focus:border-primary"
               >
-                <option value="g">Grama (g)</option>
+                {selectedFood?.category !== "Bebidas" && <option value="g">Grama (g)</option>}
                 {selectedFood?.units?.map((u) => (
                   <option key={u.label} value={u.label}>
                     {u.label.charAt(0).toUpperCase() + u.label.slice(1)}
