@@ -1,4 +1,4 @@
-export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
+export type MealType = "breakfast" | "lunch" | "dinner" | "snack" | "drink";
 
 export type MealLike = {
   _id?: string;
@@ -17,9 +17,10 @@ export const MEAL_TYPE_LABEL: Record<MealType, string> = {
   lunch: "Almoço",
   dinner: "Jantar",
   snack: "Lanche",
+  drink: "Bebida",
 };
 
-export const MEAL_TYPE_ORDER: MealType[] = ["breakfast", "lunch", "dinner", "snack"];
+export const MEAL_TYPE_ORDER: MealType[] = ["breakfast", "lunch", "dinner", "snack", "drink"];
 
 export function sumMeals(meals: MealLike[]) {
   return meals.reduce(

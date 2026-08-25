@@ -1,4 +1,4 @@
-import { IconCoffee, IconSun, IconMoon, IconCookie, IconPencil, IconTrash } from "@/components/icons";
+import { IconCoffee, IconSun, IconMoon, IconCookie, IconCup, IconPencil, IconTrash } from "@/components/icons";
 import { MEAL_TYPE_LABEL, type MealLike } from "@/lib/nutrition";
 import { cn } from "@/lib/cn";
 
@@ -7,6 +7,7 @@ const TYPE_ICON = {
   lunch: IconSun,
   dinner: IconMoon,
   snack: IconCookie,
+  drink: IconCup,
 } as const;
 
 const TYPE_TINT = {
@@ -14,6 +15,7 @@ const TYPE_TINT = {
   lunch: "bg-primary/15 text-primary",
   dinner: "bg-macro-fat/15 text-macro-fat",
   snack: "bg-macro-protein/15 text-macro-protein",
+  drink: "bg-macro-water/15 text-macro-water",
 } as const;
 
 export function MealCard({

@@ -1,6 +1,6 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
 
-export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"] as const;
+export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack", "drink"] as const;
 export type MealType = (typeof MEAL_TYPES)[number];
 
 const mealSchema = new Schema(

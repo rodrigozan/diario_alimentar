@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Card";
-import { IconCamera, IconCoffee, IconCookie, IconMoon, IconSun, IconX } from "@/components/icons";
+import { IconCamera, IconCoffee, IconCookie, IconCup, IconMoon, IconSun, IconX } from "@/components/icons";
 import {
   estimateProteinG,
   MEAL_TYPE_LABEL,
@@ -26,6 +26,7 @@ const TYPE_ICON: Record<MealType, typeof IconCoffee> = {
   lunch: IconSun,
   dinner: IconMoon,
   snack: IconCookie,
+  drink: IconCup,
 };
 
 export type MealFormValues = {
@@ -275,7 +276,7 @@ export function MealFormSheet({
           </button>
         </div>
 
-        <div className="mb-4 grid grid-cols-4 gap-2">
+        <div className="mb-4 grid grid-cols-5 gap-1.5">
           {MEAL_TYPE_ORDER.map((t) => {
             const Icon = TYPE_ICON[t];
             const active = type === t;

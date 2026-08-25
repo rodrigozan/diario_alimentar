@@ -101,6 +101,16 @@ export function IconCookie(props: IconProps) {
   );
 }
 
+export function IconCup(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6 3h9l-.7 13.5a3 3 0 0 1-3 2.8h-1.6a3 3 0 0 1-3-2.8L6 3Z" />
+      <path d="M6.4 8H14.6" />
+      <path d="M9 21h4" />
+    </svg>
+  );
+}
+
 export function IconCamera(props: IconProps) {
   return (
     <svg {...base} {...props}>
